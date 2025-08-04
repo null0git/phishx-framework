@@ -50,5 +50,5 @@
 
 1. **Clone the repository**:
 ```bash
-git clone https://github.com/your-org/phishx-framework.git
+git clone https://github.com/null0git/phishx-framework.git
 cd phishx-framework
