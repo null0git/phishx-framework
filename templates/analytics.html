@@ -1,0 +1,573 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics - PhishX{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+            <p class="text-muted">Comprehensive analysis of your phishing campaigns</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-primary" onclick="refreshAnalytics()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button class="btn btn-outline-success" onclick="exportReport()">
+                    <i class="fas fa-file-export"></i> Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Range Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-calendar"></i> Time Range</h6>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="btn-group w-100" role="group">
+                                <input type="radio" class="btn-check" name="timeRange" id="range7" value="7" checked>
+                                <label class="btn btn-outline-primary" for="range7">7 Days</label>
+                                
+                                <input type="radio" class="btn-check" name="timeRange" id="range30" value="30">
+                                <label class="btn btn-outline-primary" for="range30">30 Days</label>
+                                
+                                <input type="radio" class="btn-check" name="timeRange" id="range90" value="90">
+                                <label class="btn btn-outline-primary" for="range90">90 Days</label>
+                                
+                                <input type="radio" class="btn-check" name="timeRange" id="rangeAll" value="all">
+                                <label class="btn btn-outline-primary" for="rangeAll">All Time</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Capture Timeline Chart -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-line"></i> Capture Timeline</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="captureTimelineChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-gradient-primary text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Total Captures</div>
+                            <div class="h5 mb-0 font-weight-bold" id="totalCaptures">Loading...</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-fish fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-gradient-success text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Success Rate</div>
+                            <div class="h5 mb-0 font-weight-bold" id="successRate">Loading...</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-percentage fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-gradient-info text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Unique Victims</div>
+                            <div class="h5 mb-0 font-weight-bold" id="uniqueVictims">Loading...</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card bg-gradient-warning text-white">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="text-xs font-weight-bold text-uppercase mb-1">Avg. Time to Compromise</div>
+                            <div class="h5 mb-0 font-weight-bold" id="avgTime">Loading...</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-clock fa-2x"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Geographic Distribution -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-globe"></i> Geographic Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div id="worldMap" style="height: 400px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Countries -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-flag"></i> Top Countries</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="countriesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Browser Statistics -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-browser"></i> Browser Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="browsersChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Operating Systems -->
+        <div class="col-xl-6 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-desktop"></i> Operating Systems</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="osChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Campaign Performance -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-trophy"></i> Campaign Performance</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="campaignPerformanceTable">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Total Visits</th>
+                                    <th>Credentials Captured</th>
+                                    <th>Unique Visitors</th>
+                                    <th>Conversion Rate</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaignPerformanceBody">
+                                <tr>
+                                    <td colspan="6" class="text-center">
+                                        <div class="spinner-border" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hourly Activity Heatmap -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header">
+                    <h5><i class="fas fa-clock"></i> Activity Heatmap (24 Hours)</h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="hourlyActivityChart" height="100"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/analytics.js') }}"></script>
+<script>
+let captureTimelineChart, countriesChart, browsersChart, osChart, hourlyActivityChart;
+let worldMap;
+
+// Initialize analytics dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+    loadAnalyticsData();
+    
+    // Time range change handler
+    document.querySelectorAll('input[name="timeRange"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            loadAnalyticsData();
+        });
+    });
+});
+
+function initializeCharts() {
+    // Initialize Capture Timeline Chart
+    const timelineCtx = document.getElementById('captureTimelineChart').getContext('2d');
+    captureTimelineChart = new Chart(timelineCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Captured Credentials',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                tension: 0.1,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                x: {
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            }
+        }
+    });
+
+    // Initialize Countries Chart
+    const countriesCtx = document.getElementById('countriesChart').getContext('2d');
+    countriesChart = new Chart(countriesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            }
+        }
+    });
+
+    // Initialize Browsers Chart
+    const browsersCtx = document.getElementById('browsersChart').getContext('2d');
+    browsersChart = new Chart(browsersCtx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Users',
+                data: [],
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                x: {
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            }
+        }
+    });
+
+    // Initialize OS Chart
+    const osCtx = document.getElementById('osChart').getContext('2d');
+    osChart = new Chart(osCtx, {
+        type: 'pie',
+        data: {
+            labels: [],
+            datasets: [{
+                data: [],
+                backgroundColor: [
+                    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                    '#9966FF', '#FF9F40'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            }
+        }
+    });
+
+    // Initialize Hourly Activity Chart
+    const hourlyCtx = document.getElementById('hourlyActivityChart').getContext('2d');
+    hourlyActivityChart = new Chart(hourlyCtx, {
+        type: 'bar',
+        data: {
+            labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+            datasets: [{
+                label: 'Activity',
+                data: new Array(24).fill(0),
+                backgroundColor: 'rgba(255, 206, 86, 0.8)',
+                borderColor: 'rgba(255, 206, 86, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: { color: 'white' }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                },
+                x: {
+                    ticks: { color: 'white' },
+                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                }
+            }
+        }
+    });
+
+    // Initialize World Map
+    worldMap = L.map('worldMap').setView([20, 0], 2);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(worldMap);
+}
+
+function loadAnalyticsData() {
+    const timeRange = document.querySelector('input[name="timeRange"]:checked').value;
+    
+    // Load timeline data
+    fetch(`/api/analytics/timeline?range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            updateTimelineChart(data);
+        });
+    
+    // Load location data
+    fetch(`/api/analytics/locations?range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            updateLocationCharts(data);
+        });
+    
+    // Load browser data
+    fetch(`/api/analytics/browsers?range=${timeRange}`)
+        .then(response => response.json())
+        .then(data => {
+            updateBrowserCharts(data);
+        });
+    
+    // Load campaign performance
+    loadCampaignPerformance();
+    
+    // Update statistics
+    updateStatistics();
+}
+
+function updateTimelineChart(data) {
+    captureTimelineChart.data.labels = data.map(item => item.date);
+    captureTimelineChart.data.datasets[0].data = data.map(item => item.captures);
+    captureTimelineChart.update();
+}
+
+function updateLocationCharts(data) {
+    // Update countries chart
+    const countries = Object.keys(data.countries);
+    const countryCounts = Object.values(data.countries);
+    
+    countriesChart.data.labels = countries.slice(0, 8);
+    countriesChart.data.datasets[0].data = countryCounts.slice(0, 8);
+    countriesChart.update();
+    
+    // Update world map
+    worldMap.eachLayer(function(layer) {
+        if (layer instanceof L.Marker) {
+            worldMap.removeLayer(layer);
+        }
+    });
+    
+    // Add markers for countries (simplified)
+    // In production, you'd use actual coordinates
+}
+
+function updateBrowserCharts(data) {
+    // Update browsers chart
+    const browsers = Object.keys(data.browsers);
+    const browserCounts = Object.values(data.browsers);
+    
+    browsersChart.data.labels = browsers;
+    browsersChart.data.datasets[0].data = browserCounts;
+    browsersChart.update();
+    
+    // Update OS chart
+    const os = Object.keys(data.operating_systems);
+    const osCounts = Object.values(data.operating_systems);
+    
+    osChart.data.labels = os;
+    osChart.data.datasets[0].data = osCounts;
+    osChart.update();
+}
+
+function loadCampaignPerformance() {
+    fetch('/api/analytics/campaigns')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('campaignPerformanceBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(campaign => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <strong>${campaign.campaign_name}</strong>
+                        <br><small class="text-muted">ID: ${campaign.campaign_id}</small>
+                    </td>
+                    <td>${campaign.total_visits}</td>
+                    <td>${campaign.credentials_captured}</td>
+                    <td>${campaign.unique_visitors}</td>
+                    <td>
+                        <span class="badge ${campaign.conversion_rate > 5 ? 'bg-success' : campaign.conversion_rate > 2 ? 'bg-warning' : 'bg-danger'}">
+                            ${campaign.conversion_rate}%
+                        </span>
+                    </td>
+                    <td>
+                        <span class="badge ${campaign.is_active ? 'bg-success' : 'bg-secondary'}">
+                            ${campaign.is_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        });
+}
+
+function updateStatistics() {
+    // Update summary statistics
+    fetch('/api/analytics/summary')
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('totalCaptures').textContent = data.total_captures || '0';
+            document.getElementById('successRate').textContent = (data.success_rate || 0).toFixed(1) + '%';
+            document.getElementById('uniqueVictims').textContent = data.unique_victims || '0';
+            document.getElementById('avgTime').textContent = data.avg_time || 'N/A';
+        });
+}
+
+function refreshAnalytics() {
+    loadAnalyticsData();
+    showToast('Analytics refreshed successfully');
+}
+
+function exportReport() {
+    const timeRange = document.querySelector('input[name="timeRange"]:checked').value;
+    window.location.href = `/admin/analytics/export?range=${timeRange}`;
+}
+
+function showToast(message) {
+    // Simple toast notification
+    const toast = document.createElement('div');
+    toast.className = 'toast show position-fixed bottom-0 end-0 m-3';
+    toast.innerHTML = `
+        <div class="toast-header">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong class="me-auto">Success</strong>
+        </div>
+        <div class="toast-body">${message}</div>
+    `;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+</script>
+{% endblock %}

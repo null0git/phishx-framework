@@ -1,0 +1,650 @@
+{% extends "base.html" %}
+
+{% block title %}Settings - PhishX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1><i class="fas fa-cog"></i> Settings</h1>
+            <p class="text-muted">Configure your PhishX framework</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Settings Navigation -->
+        <div class="col-lg-3">
+            <div class="list-group" id="settings-nav">
+                <a class="list-group-item list-group-item-action active" data-bs-toggle="list" href="#profile-settings">
+                    <i class="fas fa-user"></i> Profile Settings
+                </a>
+                <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#security-settings">
+                    <i class="fas fa-shield-alt"></i> Security
+                </a>
+                <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#notification-settings">
+                    <i class="fas fa-bell"></i> Notifications
+                </a>
+                <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#system-settings">
+                    <i class="fas fa-server"></i> System
+                </a>
+                <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#integration-settings">
+                    <i class="fas fa-plug"></i> Integrations
+                </a>
+                <a class="list-group-item list-group-item-action" data-bs-toggle="list" href="#advanced-settings">
+                    <i class="fas fa-tools"></i> Advanced
+                </a>
+            </div>
+        </div>
+
+        <!-- Settings Content -->
+        <div class="col-lg-9">
+            <div class="tab-content">
+                <!-- Profile Settings -->
+                <div class="tab-pane fade show active" id="profile-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-user"></i> Profile Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ url_for('admin.update_settings') }}">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Username</label>
+                                            <input type="text" class="form-control" id="username" name="username" 
+                                                   value="{{ current_user.username }}" readonly>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{ current_user.email }}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Current Password</label>
+                                    <input type="password" class="form-control" id="current_password" name="current_password">
+                                    <div class="form-text">Required to make changes</div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="new_password" class="form-label">New Password</label>
+                                            <input type="password" class="form-control" id="new_password" name="new_password">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="confirm_password" class="form-label">Confirm New Password</label>
+                                            <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="tab-pane fade" id="security-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-shield-alt"></i> Security Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enable2fa">
+                                        <label class="form-check-label" for="enable2fa">
+                                            Enable Two-Factor Authentication
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableSessionTimeout" checked>
+                                        <label class="form-check-label" for="enableSessionTimeout">
+                                            Enable Session Timeout
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableLoginAudit" checked>
+                                        <label class="form-check-label" for="enableLoginAudit">
+                                            Enable Login Audit Logging
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="sessionTimeout" class="form-label">Session Timeout (hours)</label>
+                                        <input type="number" class="form-control" id="sessionTimeout" value="24" min="1" max="168">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="maxLoginAttempts" class="form-label">Max Login Attempts</label>
+                                        <input type="number" class="form-control" id="maxLoginAttempts" value="5" min="3" max="10">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="passwordStrength" class="form-label">Password Strength</label>
+                                        <select class="form-select" id="passwordStrength">
+                                            <option value="low">Low (8+ characters)</option>
+                                            <option value="medium" selected>Medium (8+ chars, mixed case)</option>
+                                            <option value="high">High (12+ chars, special chars)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="saveSecuritySettings()">
+                                <i class="fas fa-save"></i> Save Security Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="tab-pane fade" id="notification-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-bell"></i> Notification Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Telegram Notifications</h6>
+                                    <div class="mb-3">
+                                        <label for="telegramToken" class="form-label">Bot Token</label>
+                                        <input type="text" class="form-control" id="telegramToken" 
+                                               placeholder="Enter Telegram bot token">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="telegramChatId" class="form-label">Chat ID</label>
+                                        <input type="text" class="form-control" id="telegramChatId" 
+                                               placeholder="Enter chat ID">
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="testTelegram()">
+                                        <i class="fas fa-test-tube"></i> Test Connection
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Slack Notifications</h6>
+                                    <div class="mb-3">
+                                        <label for="slackWebhook" class="form-label">Webhook URL</label>
+                                        <input type="url" class="form-control" id="slackWebhook" 
+                                               placeholder="Enter Slack webhook URL">
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="testSlack()">
+                                        <i class="fas fa-test-tube"></i> Test Connection
+                                    </button>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h6>Notification Events</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyCredCapture" checked>
+                                        <label class="form-check-label" for="notifyCredCapture">
+                                            Credential Captures
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notify2fa" checked>
+                                        <label class="form-check-label" for="notify2fa">
+                                            2FA Token Captures
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyCampaignStart">
+                                        <label class="form-check-label" for="notifyCampaignStart">
+                                            Campaign Start/Stop
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifySystemErrors">
+                                        <label class="form-check-label" for="notifySystemErrors">
+                                            System Errors
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyHighVolume">
+                                        <label class="form-check-label" for="notifyHighVolume">
+                                            High Volume Alerts
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="notifyDailyReport">
+                                        <label class="form-check-label" for="notifyDailyReport">
+                                            Daily Reports
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="saveNotificationSettings()">
+                                <i class="fas fa-save"></i> Save Notification Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Settings -->
+                <div class="tab-pane fade" id="system-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-server"></i> System Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="defaultPort" class="form-label">Default Phishing Port</label>
+                                        <input type="number" class="form-control" id="defaultPort" value="5000" min="1024" max="65535">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="maxCampaigns" class="form-label">Max Concurrent Campaigns</label>
+                                        <input type="number" class="form-control" id="maxCampaigns" value="50" min="1" max="100">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="logRetention" class="form-label">Log Retention (days)</label>
+                                        <input type="number" class="form-control" id="logRetention" value="365" min="30" max="3650">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableGeoLocation" checked>
+                                        <label class="form-check-label" for="enableGeoLocation">
+                                            Enable GeoLocation Tracking
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableProxy" checked>
+                                        <label class="form-check-label" for="enableProxy">
+                                            Enable Reverse Proxy
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableAnalytics" checked>
+                                        <label class="form-check-label" for="enableAnalytics">
+                                            Enable Analytics Collection
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="saveSystemSettings()">
+                                <i class="fas fa-save"></i> Save System Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Integration Settings -->
+                <div class="tab-pane fade" id="integration-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-plug"></i> Integration Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>SIEM Integration</h6>
+                                    <div class="mb-3">
+                                        <label for="siemEndpoint" class="form-label">SIEM Endpoint</label>
+                                        <input type="url" class="form-control" id="siemEndpoint" 
+                                               placeholder="https://your-siem.com/api/events">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="siemApiKey" class="form-label">API Key</label>
+                                        <input type="password" class="form-control" id="siemApiKey" 
+                                               placeholder="Enter SIEM API key">
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Threat Intelligence</h6>
+                                    <div class="mb-3">
+                                        <label for="threatIntelApi" class="form-label">Threat Intel API</label>
+                                        <input type="url" class="form-control" id="threatIntelApi" 
+                                               placeholder="https://api.threatintel.com">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="threatIntelKey" class="form-label">API Key</label>
+                                        <input type="password" class="form-control" id="threatIntelKey" 
+                                               placeholder="Enter API key">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h6>Webhook Endpoints</h6>
+                            <div class="mb-3">
+                                <label for="webhookEndpoint" class="form-label">Custom Webhook URL</label>
+                                <input type="url" class="form-control" id="webhookEndpoint" 
+                                       placeholder="https://your-system.com/webhook">
+                                <div class="form-text">Receive real-time notifications via webhook</div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="saveIntegrationSettings()">
+                                <i class="fas fa-save"></i> Save Integration Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="tab-pane fade" id="advanced-settings">
+                    <div class="card shadow">
+                        <div class="card-header">
+                            <h5><i class="fas fa-tools"></i> Advanced Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Warning:</strong> These settings are for advanced users only. 
+                                Incorrect configuration may affect system functionality.
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>AI/ML Features</h6>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableAiEvasion">
+                                        <label class="form-check-label" for="enableAiEvasion">
+                                            Enable AI Evasion Techniques
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableMlAnalytics">
+                                        <label class="form-check-label" for="enableMlAnalytics">
+                                            Enable ML-Powered Analytics
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableQuantumCrypto">
+                                        <label class="form-check-label" for="enableQuantumCrypto">
+                                            Enable Quantum-Resistant Crypto
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Experimental Features</h6>
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableDeepfake">
+                                        <label class="form-check-label" for="enableDeepfake">
+                                            Enable Deepfake Generation
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableVoiceCloning">
+                                        <label class="form-check-label" for="enableVoiceCloning">
+                                            Enable Voice Cloning
+                                        </label>
+                                    </div>
+
+                                    <div class="form-check form-switch mb-3">
+                                        <input class="form-check-input" type="checkbox" id="enableNeuralInterface">
+                                        <label class="form-check-label" for="enableNeuralInterface">
+                                            Enable Neural Interface Testing
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h6>Database Management</h6>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-info w-100 mb-2" onclick="backupDatabase()">
+                                        <i class="fas fa-database"></i> Backup Database
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-warning w-100 mb-2" onclick="optimizeDatabase()">
+                                        <i class="fas fa-tools"></i> Optimize Database
+                                    </button>
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="button" class="btn btn-outline-danger w-100 mb-2" onclick="resetSystem()">
+                                        <i class="fas fa-refresh"></i> Reset System
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn btn-primary" onclick="saveAdvancedSettings()">
+                                <i class="fas fa-save"></i> Save Advanced Settings
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Settings management functions
+function saveSecuritySettings() {
+    const settings = {
+        enable_2fa: document.getElementById('enable2fa').checked,
+        session_timeout: document.getElementById('enableSessionTimeout').checked,
+        login_audit: document.getElementById('enableLoginAudit').checked,
+        session_timeout_hours: document.getElementById('sessionTimeout').value,
+        max_login_attempts: document.getElementById('maxLoginAttempts').value,
+        password_strength: document.getElementById('passwordStrength').value
+    };
+    
+    saveSettings('security', settings);
+}
+
+function saveNotificationSettings() {
+    const settings = {
+        telegram_token: document.getElementById('telegramToken').value,
+        telegram_chat_id: document.getElementById('telegramChatId').value,
+        slack_webhook: document.getElementById('slackWebhook').value,
+        notify_cred_capture: document.getElementById('notifyCredCapture').checked,
+        notify_2fa: document.getElementById('notify2fa').checked,
+        notify_campaign_start: document.getElementById('notifyCampaignStart').checked,
+        notify_system_errors: document.getElementById('notifySystemErrors').checked,
+        notify_high_volume: document.getElementById('notifyHighVolume').checked,
+        notify_daily_report: document.getElementById('notifyDailyReport').checked
+    };
+    
+    saveSettings('notifications', settings);
+}
+
+function saveSystemSettings() {
+    const settings = {
+        default_port: document.getElementById('defaultPort').value,
+        max_campaigns: document.getElementById('maxCampaigns').value,
+        log_retention: document.getElementById('logRetention').value,
+        enable_geolocation: document.getElementById('enableGeoLocation').checked,
+        enable_proxy: document.getElementById('enableProxy').checked,
+        enable_analytics: document.getElementById('enableAnalytics').checked
+    };
+    
+    saveSettings('system', settings);
+}
+
+function saveIntegrationSettings() {
+    const settings = {
+        siem_endpoint: document.getElementById('siemEndpoint').value,
+        siem_api_key: document.getElementById('siemApiKey').value,
+        threat_intel_api: document.getElementById('threatIntelApi').value,
+        threat_intel_key: document.getElementById('threatIntelKey').value,
+        webhook_endpoint: document.getElementById('webhookEndpoint').value
+    };
+    
+    saveSettings('integrations', settings);
+}
+
+function saveAdvancedSettings() {
+    const settings = {
+        enable_ai_evasion: document.getElementById('enableAiEvasion').checked,
+        enable_ml_analytics: document.getElementById('enableMlAnalytics').checked,
+        enable_quantum_crypto: document.getElementById('enableQuantumCrypto').checked,
+        enable_deepfake: document.getElementById('enableDeepfake').checked,
+        enable_voice_cloning: document.getElementById('enableVoiceCloning').checked,
+        enable_neural_interface: document.getElementById('enableNeuralInterface').checked
+    };
+    
+    saveSettings('advanced', settings);
+}
+
+function saveSettings(category, settings) {
+    fetch(`/admin/settings/${category}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Settings saved successfully');
+        } else {
+            showAlert('danger', 'Error saving settings: ' + data.error);
+        }
+    })
+    .catch(error => {
+        showAlert('danger', 'Error saving settings');
+    });
+}
+
+function testTelegram() {
+    const token = document.getElementById('telegramToken').value;
+    const chatId = document.getElementById('telegramChatId').value;
+    
+    if (!token || !chatId) {
+        showAlert('warning', 'Please enter both token and chat ID');
+        return;
+    }
+    
+    fetch('/admin/test-telegram', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            token: token,
+            chat_id: chatId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Telegram connection successful');
+        } else {
+            showAlert('danger', 'Telegram connection failed: ' + data.error);
+        }
+    });
+}
+
+function testSlack() {
+    const webhook = document.getElementById('slackWebhook').value;
+    
+    if (!webhook) {
+        showAlert('warning', 'Please enter webhook URL');
+        return;
+    }
+    
+    fetch('/admin/test-slack', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            webhook_url: webhook
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Slack connection successful');
+        } else {
+            showAlert('danger', 'Slack connection failed: ' + data.error);
+        }
+    });
+}
+
+function backupDatabase() {
+    if (confirm('Create a backup of the database?')) {
+        window.location.href = '/admin/backup-database';
+    }
+}
+
+function optimizeDatabase() {
+    if (confirm('Optimize the database? This may take a few minutes.')) {
+        fetch('/admin/optimize-database', {method: 'POST'})
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showAlert('success', 'Database optimized successfully');
+            } else {
+                showAlert('danger', 'Error optimizing database');
+            }
+        });
+    }
+}
+
+function resetSystem() {
+    if (confirm('Reset the entire system? This will delete all data and cannot be undone!')) {
+        if (confirm('Are you absolutely sure? This action is irreversible!')) {
+            fetch('/admin/reset-system', {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showAlert('success', 'System reset successfully');
+                    setTimeout(() => {
+                        window.location.href = '/admin/login';
+                    }, 2000);
+                } else {
+                    showAlert('danger', 'Error resetting system');
+                }
+            });
+        }
+    }
+}
+
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    const container = document.querySelector('.container');
+    container.insertBefore(alertDiv, container.firstChild);
+    
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 5000);
+}
+</script>
+{% endblock %}

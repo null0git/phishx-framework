@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Campaigns - PhishX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1><i class="fas fa-bullseye"></i> Campaigns</h1>
+            <p class="text-muted">Manage your phishing campaigns</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
+                <i class="fas fa-plus"></i> Create Campaign
+            </button>
+        </div>
+    </div>
+
+    <!-- Campaigns Table -->
+    <div class="card shadow">
+        <div class="card-body">
+            {% if campaigns.items %}
+            <div class="table-responsive">
+                <table class="table table-hover" id="campaignsTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Template</th>
+                            <th>Status</th>
+                            <th>Phish URL</th>
+                            <th>Captures</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for campaign in campaigns.items %}
+                        <tr>
+                            <td>
+                                <strong>{{ campaign.name }}</strong>
+                                {% if campaign.description %}
+                                <br><small class="text-muted">{{ campaign.description[:50] }}...</small>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">{{ campaign.template.name }}</span>
+                            </td>
+                            <td>
+                                {% if campaign.is_active %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-play"></i> Active
+                                </span>
+                                {% else %}
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-stop"></i> Stopped
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ campaign.phish_url }}" target="_blank" class="text-info">
+                                    {{ campaign.phish_url }}
+                                    <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </td>
+                            <td>
+                                <span class="badge bg-info">{{ campaign.captured_credentials | length }}</span>
+                            </td>
+                            <td>
+                                <small class="text-muted">{{ campaign.created_at.strftime('%m/%d/%Y') }}</small>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ url_for('admin.toggle_campaign', campaign_id=campaign.id) }}" 
+                                       class="btn btn-sm {% if campaign.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                                        {% if campaign.is_active %}
+                                            <i class="fas fa-stop"></i>
+                                        {% else %}
+                                            <i class="fas fa-play"></i>
+                                        {% endif %}
+                                    </a>
+                                    <button class="btn btn-sm btn-info" onclick="copyToClipboard('{{ campaign.phish_url }}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showCampaignStats({{ campaign.id }})">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if campaigns.pages > 1 %}
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if campaigns.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.campaigns', page=campaigns.prev_num) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in campaigns.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != campaigns.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('admin.campaigns', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">…</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if campaigns.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('admin.campaigns', page=campaigns.next_num) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-bullseye fa-3x text-muted mb-3"></i>
+                <h5>No Campaigns Yet</h5>
+                <p class="text-muted">Create your first phishing campaign to get started</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCampaignModal">
+                    <i class="fas fa-plus"></i> Create Campaign
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Create Campaign Modal -->
+<div class="modal fade" id="createCampaignModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-plus"></i> Create New Campaign</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('admin.create_campaign') }}">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Campaign Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="template_id" class="form-label">Template</label>
+                                <select class="form-select" id="template_id" name="template_id" required>
+                                    <option value="">Select Template</option>
+                                    {% for template in templates %}
+                                    <option value="{{ template.id }}">{{ template.name }} ({{ template.category }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="target_url" class="form-label">Target URL (Redirect After Capture)</label>
+                        <input type="url" class="form-control" id="target_url" name="target_url" 
+                               placeholder="https://example.com">
+                        <div class="form-text">Users will be redirected here after submitting credentials</div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="port" class="form-label">Custom Port (Optional)</label>
+                                <input type="number" class="form-control" id="port" name="port" 
+                                       min="5001" max="65535" placeholder="5001">
+                                <div class="form-text">Leave empty to use path-based routing</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="path" class="form-label">Custom Path (Optional)</label>
+                                <input type="text" class="form-control" id="path" name="path" 
+                                       placeholder="campaign-name">
+                                <div class="form-text">Used when not using custom port</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Campaign</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Campaign Stats Modal -->
+<div class="modal fade" id="campaignStatsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-chart-bar"></i> Campaign Statistics</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="campaignStatsContent">
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+// Initialize DataTable
+$(document).ready(function() {
+    $('#campaignsTable').DataTable({
+        "pageLength": 25,
+        "order": [[ 5, "desc" ]], // Sort by created date
+        "columnDefs": [
+            { "orderable": false, "targets": 6 } // Disable sorting on actions column
+        ]
+    });
+});
+
+// Copy to clipboard function
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        // Show success message
+        const toast = new bootstrap.Toast(document.getElementById('copyToast'));
+        toast.show();
+    });
+}
+
+// Show campaign statistics
+function showCampaignStats(campaignId) {
+    const modal = new bootstrap.Modal(document.getElementById('campaignStatsModal'));
+    modal.show();
+    
+    // Load stats via AJAX
+    fetch(`/api/campaigns/${campaignId}/stats`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('campaignStatsContent').innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h4>${data.total_visits}</h4>
+                                <p>Total Visits</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h4>${data.captured_credentials}</h4>
+                                <p>Captured Credentials</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h4>${data.unique_ips}</h4>
+                                <p>Unique IPs</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .catch(error => {
+            document.getElementById('campaignStatsContent').innerHTML = 
+                '<div class="alert alert-danger">Error loading statistics</div>';
+        });
+}
+</script>
+
+<!-- Toast for copy notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="copyToast" class="toast hide" role="alert">
+        <div class="toast-header">
+            <i class="fas fa-check-circle text-success me-2"></i>
+            <strong class="me-auto">Success</strong>
+        </div>
+        <div class="toast-body">
+            URL copied to clipboard!
+        </div>
+    </div>
+</div>
+{% endblock %}

