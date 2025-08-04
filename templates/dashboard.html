@@ -211,7 +211,7 @@
 <script>
 // Capture Timeline Chart
 const ctx = document.getElementById('captureTimelineChart').getContext('2d');
-const captureData = {{ capture_stats | tojsonfilter | safe }};
+const captureData = {{ capture_stats | tojson | safe }};
 
 new Chart(ctx, {
     type: 'line',
